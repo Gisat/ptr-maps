@@ -39,7 +39,7 @@
 		"@deck.gl/mesh-layers": "^9.0.36",
 		"@deck.gl/react": "^9.0.36",
 		"@gisatcz/cross-package-react-context": "^0.2.0",
-		"@gisatcz/deckgl-geolib": "^1.12.0-dev.0",
+		"@gisatcz/deckgl-geolib": "^1.12.0-dev.2",
 		"@gisatcz/ptr-atoms": "^1.16.0",
 		"@gisatcz/ptr-core": "^1.8.1",
 		"@gisatcz/ptr-utils": "^1.6.0",
