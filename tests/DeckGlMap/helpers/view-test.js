@@ -100,7 +100,7 @@ describe('utils/DeckGlMap/helpers/view', function () {
 				longitude: 15,
 				latitude: 50,
 				minZoom: 0,
-				maxZoom: 19,
+				maxZoom: 22,
 				bearing: 30,
 				pitch: 10,
 			};
@@ -138,7 +138,7 @@ describe('utils/DeckGlMap/helpers/view', function () {
 				longitude: 15,
 				latitude: 50,
 				minZoom: 13,
-				maxZoom: 19,
+				maxZoom: 22,
 				bearing: 0,
 				pitch: 0,
 			};
@@ -179,7 +179,7 @@ describe('utils/DeckGlMap/helpers/view', function () {
 				longitude: 15,
 				latitude: 50,
 				minZoom: 0,
-				maxZoom: 19,
+				maxZoom: 22,
 				bearing: 0,
 				pitch: 0,
 			};

@@ -1,6 +1,9 @@
 import {mapConstants} from '@gisatcz/ptr-core';
 import {map as mapUtils} from '@gisatcz/ptr-utils';
 
+const MAX_ZOOM_LEVEL = 22;
+const MIN_ZOOM_LEVEL = 0;
+
 // TODO add tests
 /**
  * Return boxRange from zoom level and dimensions
@@ -73,8 +76,8 @@ function getZoomLevelFromPixelSize(pxSize) {
 function getDeckViewFromPantherViewParams(view, width, height, viewLimits) {
 	const completeView = {...mapConstants.defaultMapView, ...view};
 
-	let minZoom = mapConstants.defaultLevelsRange[0];
-	let maxZoom = mapConstants.defaultLevelsRange[1];
+	let minZoom = MIN_ZOOM_LEVEL;
+	let maxZoom = MAX_ZOOM_LEVEL;
 
 	if (viewLimits?.boxRangeRange) {
 		if (viewLimits.boxRangeRange[1]) {
