@@ -1,40 +1,52 @@
-name: Release
+name: Build & Publish NPM Package
 
 on:
   push:
-    branches:
-      - master
-      - dev
+    tags:
+      - 'v*.*.*' # prod releases, e.g. v1.2.3
+      - 'v*.*.*-dev.*' # dev releases, e.g. v1.2.3-dev.4
+
+permissions:
+  id-token: write # Required for OIDC (Trusted Publishers)
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  release:
+  build-and-publish:
+    name: Build and publish to npm
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          # Ensure that git uses your token with write access to the repo
-          token: ${{ secrets.GH_TOKEN }}
+          node-version: 'lts/*'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Prepare repository
-        run: git fetch --unshallow --tags
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Set the correct Node version using nvm
-        shell: bash -l {0}
-        run: nvm install
+      - name: Build package
+        run: npm run build
 
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: npm-deps-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-deps-${{ hashFiles('package-lock.json') }}
-      - name: Create Release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish dev tag to npm
+        if: contains(github.ref_name, '-dev.')
+        run: npm publish --tag dev
+
+      - name: Publish latest to npm
+        if: ${{ !contains(github.ref_name, '-dev.') }}
+        run: npm publish
+
+      - name: Summary
+        if: success()
         run: |
-          npm install
-          npm run build
-          npx auto shipit
+          echo "## Published ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **npm dist-tag:** \`${{ contains(github.ref_name, '-dev.') && 'dev' || 'latest' }}\`" >> $GITHUB_STEP_SUMMARY
