@@ -15,13 +15,10 @@ import MVTLayer from './layers/MVTLayer';
 import WmsLayer from './layers/WmsLayer';
 import {_WMSLayer as SingleTileWmsLayer} from '@deck.gl/geo-layers';
 import {_TerrainExtension as TerrainExtension} from '@deck.gl/extensions';
-import geolib from '@gisatcz/deckgl-geolib';
+import {CogBitmapLayer, CogTerrainLayer} from '@gisatcz/deckgl-geolib';
 
 import './style.scss';
 import DeckTooltip from './DeckTooltip';
-
-const CogBitmapLayer = geolib.CogBitmapLayer;
-const CogTerrainLayer = geolib.CogTerrainLayer;
 
 const defaultGetCursor = ({isDragging}) => (isDragging ? 'grabbing' : 'grab');
 
