@@ -15,13 +15,10 @@ import MVTLayer from './layers/MVTLayer';
 import WmsLayer from './layers/WmsLayer';
 import {_WMSLayer as SingleTileWmsLayer} from '@deck.gl/geo-layers';
 import {_TerrainExtension as TerrainExtension} from '@deck.gl/extensions';
-import geolib from '@gisatcz/deckgl-geolib';
+import {CogBitmapLayer, CogTerrainLayer} from '@gisatcz/deckgl-geolib';
 
 import './style.scss';
 import DeckTooltip from './DeckTooltip';
-
-const CogBitmapLayer = geolib.CogBitmapLayer;
-const CogTerrainLayer = geolib.CogTerrainLayer;
 
 const defaultGetCursor = ({isDragging}) => (isDragging ? 'grabbing' : 'grab');
 
@@ -34,6 +31,7 @@ const DeckGlMap = forwardRef(
 			onViewChange,
 			onZoomEnd,
 			onPanEnd,
+			onAfterRenderActive = false,
 			viewLimits,
 			view,
 			onClick = () => {},
@@ -74,31 +72,33 @@ const DeckGlMap = forwardRef(
 		};
 
 		const onAfterRender = useCallback(() => {
-			// Create base64Image, and pass it into ref
-			if (ref && _isObject(ref.current)) {
-				ref.current[mapKey].onAfterRender = true;
-				ref.current[mapKey].base64Image = deckRef.current.deck
-					.getCanvas()
-					.toDataURL('image/png');
-			}
-
-			const lastRenderedLayers =
-				deckRef?.current?.deck?.layerManager?._lastRenderedLayers;
-
-			lastRenderedLayers?.forEach(l => {
-				const zRange = l?.state.zRange;
-				if (
-					(zRange !== null &&
-						zRange !== undefined &&
-						zRangeRef.current === null) ||
-					zRange?.[0] < zRangeRef.current?.[0] ||
-					zRange?.[1] + 100 > zRangeRef.current?.[1]
-				) {
-					// save maximum and minimum zRange from layers rendered layers
-					// add "safety coefficient" to prevent zRange from going out of bounds in some layers (like MVT)
-					zRangeRef.current = [zRange[0], zRange[1] + 100];
+			if (onAfterRenderActive) {
+				// Create base64Image, and pass it into ref
+				if (ref && _isObject(ref.current)) {
+					ref.current[mapKey].onAfterRender = true;
+					ref.current[mapKey].base64Image = deckRef.current.deck
+						.getCanvas()
+						.toDataURL('image/png');
 				}
-			});
+
+				const lastRenderedLayers =
+					deckRef?.current?.deck?.layerManager?._lastRenderedLayers;
+
+				lastRenderedLayers?.forEach(l => {
+					const zRange = l?.state.zRange;
+					if (
+						(zRange !== null &&
+							zRange !== undefined &&
+							zRangeRef.current === null) ||
+						zRange?.[0] < zRangeRef.current?.[0] ||
+						zRange?.[1] + 100 > zRangeRef.current?.[1]
+					) {
+						// save maximum and minimum zRange from layers rendered layers
+						// add "safety coefficient" to prevent zRange from going out of bounds in some layers (like MVT)
+						zRangeRef.current = [zRange[0], zRange[1] + 100];
+					}
+				});
+			}
 		});
 
 		const onMapHover = useCallback(
@@ -566,6 +566,7 @@ const DeckGlMap = forwardRef(
 DeckGlMap.displayName = 'DeckGlMap';
 
 DeckGlMap.propTypes = {
+	onAfterRenderActive: PropTypes.func,
 	activeSelectionKey: PropTypes.string,
 	onResize: PropTypes.func,
 	resolveLayers: PropTypes.func,
