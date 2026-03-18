@@ -10,7 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.ref }}
           ssh-key: ${{ secrets.DEPLOY_KEY }}
+          persist-credentials: false
 
       - name: Prepare repository
         run: git fetch --unshallow --tags
